@@ -3,8 +3,19 @@ import express from 'express';
 const app = express()
 const port = 3000
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
+const musicList = [
+  {
+    title: "¸¶±×³×Æ½",
+    artist: "¾ÆÀÏ¸´",
+  },
+  {
+    title: "º½³¯",
+    artist: "BTS",
+  }
+]
+
+app.get('/music', (req, res) => {
+  res.send(musicList);
 })
 
 app.get('/about', (req, res) => {
