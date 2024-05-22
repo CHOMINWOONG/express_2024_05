@@ -1,30 +1,42 @@
 import express from 'express';
+import mysql from "mysql2/promise";
 
-const app = express()
-const port = 3000
+const pool = mysql.createPool({
+    host: "localhost",
+    user: "korad",
+    password: "kor123414",
+    database: "music_list",
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
+
+const app = express();
+const port = 3000;
 
 const musicList = [
-  {
-    title: "¸¶±×³×Æ½",
-    artist: "¾ÆÀÏ¸´",
-  },
-  {
-    title: "º½³¯",
-    artist: "BTS",
-  }
-]
+    {
+        title: "¸¶±×³×Æ½",
+        artist: "¾ÆÀÏ¸´",
+    },
+    {
+        title: "º½³¯",
+        artist: "BTS",
+    },
+];
 
-app.get('/music', (req, res) => {
-  res.send(musicList);
-})
+app.get('/music', async (req, res) => {
+  const [rows] = await pool.query("SELECT * FROM music ORDER BY id DESC");
 
-app.get('/about', (req, res) => {
-    res.send('About!')
-  })
+  res.json(rows);
+});
 
-  app.get('/setting', (req, res) => {
-    res.send('Setting!')
-  })
+app.get('/music/:id', async (req, res) => {
+    const { id } = req.params;
+    const [rows] = await pool.query("SELECT * FROM music WHERE id = ?", [id]);
+
+    res.json(rows[0]);
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
