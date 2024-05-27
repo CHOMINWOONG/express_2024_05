@@ -12,7 +12,9 @@ const pool = mysql.createPool({
 });
 
 const app = express();
+app.use(express.json());
 const port = 3000;
+
 
 const musicList = [
     {
@@ -47,4 +49,41 @@ app.get('/music/:id', async (req, res) => {
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
+})
+
+// µî·Ï
+app.post("/music", async (req, res) => {
+  const { title, artist } = req.body;
+
+  if (!title) {
+    res.status(400).json({
+      msg: "title required"
+    });
+    return;  
+  }
+
+  if (!artist) {
+    res.status(400).json({
+      msg: "title required"
+    });
+    return;  
+  }
+
+  const [rs] = await pool.query(
+    `
+    INSERT INTO music
+    SET regDate = NOW(),
+    title = ?,
+    artist = ?
+    `,
+    [title, artist]
+    
+  )
+
+  res.status(201).json({
+    id: rs.insertId,
+  })
+
+  const { id } = req.params;
+    const [rows] = await pool.query("SELECT * FROM music WHERE id = ?", [id]);
 })
